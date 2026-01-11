@@ -1,12 +1,17 @@
-import { CharacterCard } from '@/components/CharacterCard';
 import { GlobalStyles } from '@/styles/GlobalStyles';
 import StyledComponentsRegistry from '@/lib/registry';
-import { ApiResponse, Character } from '@/types/rickAndMorty';
 import { PortalBackground } from '@/components/PortalBackground';
+import { CharacterList } from '@/components/CharacterList';
+import { ApiResponse } from '@/types/rickAndMorty';
 
+// Função Server-side para buscar os dados
 async function getData(): Promise<ApiResponse> {
-  const res = await fetch('https://rickandmortyapi.com/api/character');
-  if (!res.ok) throw new Error('Erro ao buscar personagens');
+  // Adicionamos um revalidate para manter os dados atualizados a cada 24h
+  const res = await fetch('https://rickandmortyapi.com/api/character', {
+    next: { revalidate: 86400 }
+  });
+
+  if (!res.ok) throw new Error('Falha ao conectar com a API');
   return res.json();
 }
 
@@ -17,26 +22,22 @@ export default async function Home() {
     <StyledComponentsRegistry>
       <GlobalStyles />
       <PortalBackground />
-      <main style={{ padding: '3rem' }}>
+
+      <main style={{ position: 'relative', zIndex: 1, padding: '3rem', maxWidth: '1200px', margin: '0 auto' }}>
         <header style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 style={{
-            fontSize: '4rem',
+            fontSize: 'clamp(2rem, 8vw, 4rem)', // Fonte responsiva
             color: '#97ce4c',
-            textShadow: '3px 3px #ff00ff'
+            textShadow: '3px 3px #ff00ff',
+            marginBottom: '1rem'
           }}>
-            RICK AND MORTY
+            RICK AND MORTY <br /> PSYCHEDELIC
           </h1>
+          <p style={{ color: '#fff', opacity: 0.8 }}>O multiverso ao alcance dos seus olhos</p>
         </header>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: '2.5rem'
-        }}>
-          {data.results.map((char: Character) => (
-            <CharacterCard key={char.id} character={char} />
-          ))}
-        </div>
+        {/* Passamos os resultados da API para o componente que gerencia a busca */}
+        <CharacterList initialCharacters={data.results} />
       </main>
     </StyledComponentsRegistry>
   );
