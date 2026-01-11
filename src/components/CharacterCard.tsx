@@ -22,8 +22,10 @@ const Card = styled.div`
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(10px); // Efeito de vidro embaçado
+  background: rgba(0, 0, 0, 0.7);
+  // O segredo do efeito psicodélico no modal:
+  backdrop-filter: blur(12px) saturate(180%); 
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   display: flex;
   justify-content: center;
   align-items: center;

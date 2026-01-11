@@ -2,6 +2,7 @@ import { CharacterCard } from '@/components/CharacterCard';
 import { GlobalStyles } from '@/styles/GlobalStyles';
 import StyledComponentsRegistry from '@/lib/registry';
 import { ApiResponse, Character } from '@/types/rickAndMorty';
+import { PortalBackground } from '@/components/PortalBackground';
 
 async function getData(): Promise<ApiResponse> {
   const res = await fetch('https://rickandmortyapi.com/api/character');
@@ -15,6 +16,7 @@ export default async function Home() {
   return (
     <StyledComponentsRegistry>
       <GlobalStyles />
+      <PortalBackground />
       <main style={{ padding: '3rem' }}>
         <header style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 style={{
