@@ -24,17 +24,6 @@ export default async function Home() {
       <PortalBackground />
 
       <main style={{ position: 'relative', zIndex: 1, padding: '3rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <header style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h1 style={{
-            fontSize: 'clamp(2rem, 8vw, 4rem)', // Fonte responsiva
-            color: '#97ce4c',
-            textShadow: '3px 3px #ff00ff',
-            marginBottom: '1rem'
-          }}>
-            RICK AND MORTY <br /> PSYCHEDELIC
-          </h1>
-          <p style={{ color: '#fff', opacity: 0.8 }}>O multiverso ao alcance dos seus olhos</p>
-        </header>
 
         {/* Passamos os resultados da API para o componente que gerencia a busca */}
         <CharacterList initialCharacters={data.results} />
