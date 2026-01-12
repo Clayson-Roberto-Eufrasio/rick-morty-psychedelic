@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Character } from '@/types/rickAndMorty';
 
-// Estilização do Card com Styled Components + Framer Motion
+// Estilização do Card com Styled Components
 const Card = styled(motion.div)`
   border: 2px solid #97ce4c;
   border-radius: 12px;
@@ -13,6 +13,7 @@ const Card = styled(motion.div)`
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 `;
 
 const ImageContainer = styled.div`
@@ -34,43 +35,33 @@ const ModalOverlay = styled(motion.div)`
   padding: 20px;
 `;
 
-const ModalContent = styled(motion.div)`
-  background: #1a1a1a;
-  padding: 2rem;
-  border-radius: 20px;
-  border: 3px solid #b2ff00;
-  text-align: center;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
-`;
-
-// Variantes do Card corrigidas com o tipo Variants
-const cardItemVariants: Variants = {
-  hidden: { y: 50, opacity: 0, scale: 0.5 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    scale: 1,
-    transition: {
-      type: "spring", // O segredo é que agora o TypeScript sabe que isso é Variants
-      bounce: 0.4
-    }
-  }
-};
-
 export function CharacterCard({ character }: { character: Character }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <Card
-        variants={cardItemVariants}
+        // --- LÓGICA DE APARIÇÃO SUAVE ---
+        // initial: Como o card começa (invisível, levemente abaixo e desfocado)
+        initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+
+        // whileInView: Como ele fica quando entra na tela
+        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+
+        // viewport: Garante que a animação rode assim que 10% do card aparecer
+        viewport={{ once: true, amount: 0.1 }}
+
+        // transition: Controla a VELOCIDADE (aumentei para 1.5s para ser bem visível)
+        transition={{
+          duration: 1.5,
+          ease: "easeOut"
+        }}
+
+        // Efeitos de interação com o mouse
         whileHover={{
           scale: 1.05,
-          rotate: 2,
-          boxShadow: "0px 0px 20px #97ce4c",
-          zIndex: 10
+          boxShadow: "0px 0px 25px #97ce4c",
+          border: "2px solid #ff00ff"
         }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
@@ -84,12 +75,18 @@ export function CharacterCard({ character }: { character: Character }) {
             style={{ objectFit: 'cover' }}
           />
         </ImageContainer>
-        <div style={{ padding: '1rem' }}>
-          <h3 style={{ color: '#fff' }}>{character.name}</h3>
-          <p style={{ color: '#97ce4c' }}>{character.species}</p>
+
+        <div style={{ padding: '1.2rem', textAlign: 'center' }}>
+          <h3 style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '0.5rem' }}>
+            {character.name}
+          </h3>
+          <p style={{ color: '#97ce4c', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            {character.species}
+          </p>
         </div>
       </Card>
 
+      {/* Modal - Animação de entrada do detalhe */}
       <AnimatePresence>
         {isOpen && (
           <ModalOverlay
@@ -98,13 +95,23 @@ export function CharacterCard({ character }: { character: Character }) {
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
           >
-            <ModalContent
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, opacity: 0 }}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0, rotate: -5 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.5, opacity: 0 }}
               onClick={e => e.stopPropagation()}
+              style={{
+                background: '#1a1a1a',
+                padding: '2.5rem',
+                borderRadius: '24px',
+                border: '3px solid #ff00ff',
+                textAlign: 'center',
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 0 40px rgba(255, 0, 255, 0.4)'
+              }}
             >
-              <div style={{ position: 'relative', width: '150px', height: '150px', margin: '0 auto 1rem' }}>
+              <div style={{ position: 'relative', width: '180px', height: '180px', margin: '0 auto 1.5rem' }}>
                 <Image
                   src={character.image}
                   alt={character.name}
@@ -112,27 +119,31 @@ export function CharacterCard({ character }: { character: Character }) {
                   style={{ borderRadius: '50%', border: '4px solid #97ce4c' }}
                 />
               </div>
-              <h2 style={{ color: '#b2ff00', marginBottom: '1rem' }}>{character.name}</h2>
-              <div style={{ textAlign: 'left', color: '#eee', marginBottom: '1.5rem' }}>
+              <h2 style={{ color: '#ff00ff', fontSize: '2rem', marginBottom: '1rem' }}>
+                {character.name}
+              </h2>
+              <div style={{ textAlign: 'left', color: '#ccc', lineHeight: '1.6' }}>
                 <p><strong>Status:</strong> {character.status}</p>
                 <p><strong>Espécie:</strong> {character.species}</p>
-                <p><strong>Gênero:</strong> {character.gender}</p>
                 <p><strong>Origem:</strong> {character.origin.name}</p>
+                <p><strong>Localização:</strong> {character.location.name}</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
                 style={{
-                  padding: '0.8rem 2rem',
+                  marginTop: '2rem',
+                  padding: '0.8rem 2.5rem',
                   background: '#97ce4c',
+                  color: '#000',
                   border: 'none',
                   borderRadius: '50px',
-                  fontWeight: 'bold',
+                  fontWeight: '900',
                   cursor: 'pointer'
                 }}
               >
                 VOLTAR
               </button>
-            </ModalContent>
+            </motion.div>
           </ModalOverlay>
         )}
       </AnimatePresence>
